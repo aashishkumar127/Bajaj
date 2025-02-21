@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSE12345</title> <!-- Replace with your roll number -->
+    <link rel="stylesheet" th:href="@{/cssbajaj.css}">
+</head>
+<body>
+    <div class="container">
+        <h2>BFHL Challenge</h2>
+        <textarea id="jsonInput" placeholder='Enter JSON like { "data": ["A","C","z"] }'></textarea>
+        <button onclick="submitData()">Submit</button>
+        <select id="filter" multiple>
+            <option value="alphabets">Alphabets</option>
+            <option value="numbers">Numbers</option>
+            <option value="highest_alphabet">Highest Alphabet</option>
+        </select>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        async function submitData() {
+            const input = document.getElementById('jsonInput').value;
+            try {
+                const jsonData = JSON.parse(input);
+                const response = await fetch('/bfhl', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                alert("Invalid JSON format!");
+            }
+        }
+
+        function displayResult(data) {
+            const selectedFilters = Array.from(document.getElementById('filter').selectedOptions).map(opt => opt.value);
+            let outputHtml = "<h3>Response</h3><ul>";
+
+            selectedFilters.forEach(filter => {
+                if (data[filter]) {
+                    outputHtml += `<li><strong>${filter}:</strong> ${JSON.stringify(data[filter])}</li>`;
+                }
+            });
+
+            outputHtml += "</ul>";
+            document.getElementById('output').innerHTML = outputHtml;
+        }
+    </script>
+</body>
+</html>
